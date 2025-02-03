@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ShekleinAleksey/goTickets/internal/model"
+	"github.com/ShekleinAleksey/goTickets/internal/entity"
 )
 
-var movies []model.Movie
+var movies []entity.Movie
 
 func CreateMovie(w http.ResponseWriter, r *http.Request) {
-	var movie model.Movie
+	var movie entity.Movie
 	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return

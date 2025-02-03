@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS movies (
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    balance DECIMAL(10, 2)
+    balance INT
 );
 
 -- Таблица сеансов
@@ -24,6 +24,6 @@ CREATE TABLE IF NOT EXISTS tickets (
     id SERIAL PRIMARY KEY,
     movie_screening_id INT NOT NULL REFERENCES movie_screenings(id) ON DELETE CASCADE,
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
+    price INT NOT NULL CHECK (price >= 0),
     seat VARCHAR(50) NOT NULL 
 );

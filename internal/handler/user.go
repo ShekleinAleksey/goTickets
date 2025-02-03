@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ShekleinAleksey/goTickets/internal/model"
+	"github.com/ShekleinAleksey/goTickets/internal/entity"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user model.User
+	var user entity.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
