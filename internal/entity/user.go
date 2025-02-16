@@ -1,7 +1,7 @@
 package entity
 
 type User struct {
-	ID      int
-	Name    string
-	Balance float64
+	ID      int     `json:"id"`
+	Name    string  `json:"name"`
+	Balance float64 `json:"balance"`
 }

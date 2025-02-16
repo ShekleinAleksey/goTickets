@@ -1,26 +1,44 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/ShekleinAleksey/goTickets/internal/entity"
+	"github.com/gin-gonic/gin"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+// @Summary Create User
+// @Tags user
+// @Description create user
+// @ID create-user
+// @Accept json
+// @Produce json
+// @Param input body entity.User true "create user"
+// @Success 200 {object} entity.User
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /users [post]
+func (h *Handler) CreateUser(c *gin.Context) {
 	var user entity.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	//Создание пользователя
+	id, err := h.service.UserService.CreateUser(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	user.ID = id
+
+	c.JSON(http.StatusCreated, user)
 }
 
 // Пополнить баланс
-func Replenish(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ReplenishBalance(c *gin.Context) {
 
 }
