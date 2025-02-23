@@ -4,3 +4,10 @@ http:
 
 log:
   level: 'debug'
+
+db:
+    username: "admin"
+    host: "localhost"
+    port: "5432"
+    dbname: "ticketdb"
+    sslmode: "disable"

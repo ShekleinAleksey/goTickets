@@ -22,14 +22,14 @@ import (
 func (h *Handler) CreateUser(c *gin.Context) {
 	var user entity.User
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	//Создание пользователя
 	id, err := h.service.UserService.CreateUser(&user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

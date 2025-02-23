@@ -1,7 +1,4 @@
 DROP TABLE IF EXISTS tickets;
-
 DROP TABLE IF EXISTS movie_screenings;
-
 DROP TABLE IF EXISTS users;
-
 DROP TABLE IF EXISTS movies;

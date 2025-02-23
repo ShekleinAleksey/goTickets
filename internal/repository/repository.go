@@ -1,6 +1,8 @@
 package repository
 
-import "database/sql"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 type Repository struct {
 	UserRepository           *UserRepository
@@ -9,7 +11,7 @@ type Repository struct {
 	TicketRepository         *TicketRepository
 }
 
-func NewRepository(db *sql.DB) *Repository {
+func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		UserRepository:           NewUserRepository(db),
 		MovieRepository:          NewMovieRepository(db),
