@@ -11,6 +11,7 @@ import (
 	"github.com/ShekleinAleksey/goTickets/pkg/postgres"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 // @title Tickets Service
@@ -18,7 +19,7 @@ import (
 // @description API Service for Tickets App
 
 // @host localhost:8080
-// @BasePath /api/v1/
+// @BasePath /api/
 func Run() {
 	logrus.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
@@ -29,8 +30,19 @@ func Run() {
 		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 
+	if err := initConfig(); err != nil {
+		logrus.Fatalf("error initializing configs: %s", err.Error())
+	}
+
 	logrus.Info("Initializing db...")
-	db, err := postgres.NewDB()
+	db, err := postgres.NewDB(postgres.Config{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
+		Password: os.Getenv("DB_PASSWORD"),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,4 +59,10 @@ func Run() {
 
 	log.Println("Server started at :8080")
 	http.ListenAndServe(":8080", router)
+}
+
+func initConfig() error {
+	viper.AddConfigPath("config")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }

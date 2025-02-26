@@ -14,5 +14,18 @@ func NewMovieService(repo repository.MovieRepository) *MovieService {
 }
 
 func (s *MovieService) GetAllMovies() ([]entity.Movie, error) {
-	return s.repo.GetAllMovies()
+	movies, err := s.repo.GetAllMovies()
+	if err != nil {
+		return nil, err
+	}
+
+	return movies, nil
+}
+
+func (s *MovieService) GetMovieByID(id int) (entity.Movie, error) {
+	movie, err := s.repo.GetMovieByID(id)
+	if err != nil {
+		return entity.Movie{}, err
+	}
+	return movie, nil
 }

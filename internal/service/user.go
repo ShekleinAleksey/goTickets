@@ -14,5 +14,33 @@ func NewUserService(repo repository.UserRepository) *UserService {
 }
 
 func (s *UserService) CreateUser(user *entity.User) (int, error) {
-	return s.repo.CreateUser(user)
+	id, err := s.repo.CreateUser(user)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func (s *UserService) GetUserByID(id int) (entity.User, error) {
+	user, err := s.repo.GetUserByID(id)
+	if err != nil {
+		return entity.User{}, err
+	}
+	return user, nil
+}
+
+func (s *UserService) UpdateUser(user *entity.User) error {
+	err := s.repo.UpdateUser(user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *UserService) DeleteUser(id int) error {
+	err := s.repo.DeleteUser(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

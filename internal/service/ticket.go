@@ -16,3 +16,13 @@ func NewTicketService(repo repository.TicketRepository) *TicketService {
 func (s *TicketService) GetTicket(id int) (entity.Ticket, error) {
 	return s.repo.GetTicket(id)
 }
+
+func (s *TicketService) BuyTicket(screening entity.MovieScreening, userID int, seat int) error {
+
+	err := s.repo.CreateTicket(screening, userID, seat)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

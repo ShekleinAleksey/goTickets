@@ -1,0 +1,347 @@
+basePath: /api/
+definitions:
+  entity.Movie:
+    properties:
+      description:
+        type: string
+      duration:
+        type: integer
+      genre:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.MovieScreening:
+    properties:
+      available_seats:
+        type: integer
+      hall:
+        type: integer
+      id:
+        type: integer
+      movie:
+        $ref: '#/definitions/entity.Movie'
+      show_time:
+        type: string
+      ticket_price:
+        type: number
+    type: object
+  entity.Ticket:
+    properties:
+      id:
+        type: integer
+      movie_screening:
+        $ref: '#/definitions/entity.MovieScreening'
+      price:
+        type: number
+      seat:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  entity.User:
+    properties:
+      balance:
+        type: number
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Service for Tickets App
+  title: Tickets Service
+  version: "1.0"
+paths:
+  /movies:
+    get:
+      consumes:
+      - application/json
+      description: get all movies
+      operationId: get-movies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Movie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Movies
+      tags:
+      - movie
+    post:
+      consumes:
+      - application/json
+      description: create movie
+      operationId: create-movie
+      parameters:
+      - description: create movie
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Movie'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Movie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create Movie
+      tags:
+      - movie
+  /movies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get movie by id
+      operationId: get-movie-by-id
+      parameters:
+      - description: movie id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Movie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Movie By ID
+      tags:
+      - movie
+  /screenings:
+    get:
+      description: get movie screenings
+      operationId: get-movie-screenings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.MovieScreening'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Movie Screenings
+      tags:
+      - movie_screening
+    post:
+      consumes:
+      - application/json
+      description: create movie screening
+      operationId: create-movie-screening
+      parameters:
+      - description: create movie screening
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MovieScreening'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.MovieScreening'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create Movie Screening
+      tags:
+      - movie_screening
+  /screenings/{id}:
+    get:
+      description: get movie screening
+      operationId: get-movie-screening
+      parameters:
+      - description: Movie Screening ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.MovieScreening'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Movie Screening
+      tags:
+      - movie_screening
+  /tickets/get:
+    get:
+      consumes:
+      - application/json
+      description: get ticket
+      operationId: get-ticket
+      parameters:
+      - description: get ticket
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Ticket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Ticket
+      tags:
+      - ticket
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: create user
+      operationId: create-user
+      parameters:
+      - description: create user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create User
+      tags:
+      - user
+swagger: "2.0"

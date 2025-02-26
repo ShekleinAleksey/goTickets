@@ -1,8 +1,11 @@
 package handler
 
 import (
+	_ "github.com/ShekleinAleksey/goTickets/docs"
 	"github.com/ShekleinAleksey/goTickets/internal/service"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -16,12 +19,14 @@ func NewHandler(service *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	api := router.Group("/api")
 	{
 		movies := api.Group("/movies")
 		{
 			movies.POST("/", h.CreateMovie)
 			movies.GET("/", h.GetMovies)
+			movies.GET("/:id", h.GetMovieByID)
 		}
 
 		users := api.Group("/users")
@@ -32,13 +37,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		screenings := api.Group("/screenings")
 		{
 			screenings.POST("/movie", h.CreateMovieScreening)
+			screenings.GET("/", h.GetMovieScreenings)
+			screenings.GET("/:id", h.GetMovieScreening)
 		}
 
 		tickets := api.Group("/tickets")
 		{
 			tickets.GET("/get", h.GetTicket)
 			tickets.POST("/buy", h.BuyTicket)
-			tickets.GET("/user/:id", h.GetUserTickets)
 		}
 	}
 

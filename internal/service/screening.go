@@ -14,5 +14,25 @@ func NewMovieScreeningService(repo repository.MovieScreeningRepository) *MovieSc
 }
 
 func (s *MovieScreeningService) GetAllMovieScreenings() ([]entity.MovieScreening, error) {
-	return s.repo.GetAllMovieScreenings()
+	screenings, err := s.repo.GetAllMovieScreenings()
+	if err != nil {
+		return nil, err
+	}
+	return screenings, nil
+}
+
+func (s *MovieScreeningService) GetScreening(id int) (entity.MovieScreening, error) {
+	screening, err := s.repo.GetScreening(id)
+	if err != nil {
+		return entity.MovieScreening{}, err
+	}
+	return screening, nil
+}
+
+func (s *MovieScreeningService) UpdateScreening(screening *entity.MovieScreening) error {
+	err := s.repo.UpdateScreening(screening)
+	if err != nil {
+		return err
+	}
+	return nil
 }
