@@ -32,6 +32,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		users := api.Group("/users")
 		{
 			users.POST("/", h.CreateUser)
+			users.POST("/:id/replenish-balance", h.ReplenishBalance)
 		}
 
 		screenings := api.Group("/screenings")
@@ -43,7 +44,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		tickets := api.Group("/tickets")
 		{
-			tickets.GET("/get", h.GetTicket)
+			tickets.GET("/:id", h.GetTicket)
 			tickets.POST("/buy", h.BuyTicket)
 		}
 	}

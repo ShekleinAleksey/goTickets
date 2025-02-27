@@ -13,12 +13,12 @@ import (
 // @ID get-ticket
 // @Accept json
 // @Produce json
-// @Param input body entity.Ticket true "get ticket"
+// @Param id path int true "Ticket ID"
 // @Success 200 {object} entity.Ticket
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /tickets/get [get]
+// @Router /tickets/{id} [get]
 func (h *Handler) GetTicket(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
@@ -36,6 +36,18 @@ func (h *Handler) GetTicket(c *gin.Context) {
 	c.JSON(http.StatusOK, ticket)
 }
 
+// @Summary Buy Ticket
+// @Tags ticket
+// @Description buy ticket
+// @ID buy-ticket
+// @Accept json
+// @Produce json
+// @Param input body entity.Ticket true "buy ticket"
+// @Success 200 {object} entity.Ticket
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /tickets/buy [post]
 func (h *Handler) BuyTicket(c *gin.Context) {
 	idStr := c.Query("screening_id")
 	id, err := strconv.Atoi(idStr)

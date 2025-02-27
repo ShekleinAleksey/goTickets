@@ -19,19 +19,19 @@ import (
 // @description API Service for Tickets App
 
 // @host localhost:8080
-// @BasePath /api/
+// @BasePath /api/v1/
 func Run() {
 	logrus.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 	logrus.SetOutput(os.Stdout)
 
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("error loading env variables: %s", err.Error())
+	if err := initConfig(); err != nil {
+		logrus.Fatalf("error initializing config: %s", err.Error())
 	}
 
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("error initializing configs: %s", err.Error())
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 
 	logrus.Info("Initializing db...")
@@ -44,7 +44,7 @@ func Run() {
 		Password: os.Getenv("DB_PASSWORD"),
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error opening database: %v", err)
 	}
 	defer db.Close()
 
