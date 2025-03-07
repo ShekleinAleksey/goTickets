@@ -2,18 +2,32 @@ package handler
 
 import (
 	_ "github.com/ShekleinAleksey/goTickets/docs"
-	"github.com/ShekleinAleksey/goTickets/internal/service"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-type Handler struct {
-	service *service.Service
+type Deps struct {
+	MovieService          MovieService
+	MovieScreeningService MovieScreeningService
+	TicketService         TicketService
+	UserService           UserService
 }
 
-func NewHandler(service *service.Service) *Handler {
-	return &Handler{service: service}
+type Handler struct {
+	MovieHandler          *MovieHandler
+	MovieScreeningHandler *MovieScreeningHandler
+	TicketHandler         *TicketHandler
+	UserHandler           *UserHandler
+}
+
+func NewHandler(deps Deps) *Handler {
+	return &Handler{
+		MovieHandler:          NewMovieHandler(deps.MovieService),
+		MovieScreeningHandler: NewMovieSceeningHandler(deps.MovieScreeningService),
+		TicketHandler:         NewTicketHandler(deps.TicketService),
+		UserHandler:           NewUserHandler(deps.UserService),
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
@@ -24,28 +38,26 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		movies := api.Group("/movies")
 		{
-			movies.POST("/", h.CreateMovie)
-			movies.GET("/", h.GetMovies)
-			movies.GET("/:id", h.GetMovieByID)
+			movies.GET("/", h.MovieHandler.GetMovies)
+			movies.GET("/:id", h.MovieHandler.GetMovieByID)
 		}
 
 		users := api.Group("/users")
 		{
-			users.POST("/", h.CreateUser)
-			users.POST("/:id/replenish-balance", h.ReplenishBalance)
+			users.POST("/", h.UserHandler.CreateUser)
+			users.POST("/:id/replenish-balance", h.UserHandler.ReplenishBalance)
 		}
 
 		screenings := api.Group("/screenings")
 		{
-			screenings.POST("/movie", h.CreateMovieScreening)
-			screenings.GET("/", h.GetMovieScreenings)
-			screenings.GET("/:id", h.GetMovieScreening)
+			screenings.GET("/", h.MovieScreeningHandler.GetMovieScreenings)
+			screenings.GET("/:id", h.MovieScreeningHandler.GetMovieScreening)
 		}
 
 		tickets := api.Group("/tickets")
 		{
-			tickets.GET("/:id", h.GetTicket)
-			tickets.POST("/buy", h.BuyTicket)
+			tickets.GET("/:id", h.TicketHandler.GetTicket)
+			tickets.POST("/buy", h.TicketHandler.BuyTicket)
 		}
 	}
 

@@ -13,13 +13,13 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) CreateUser(user *entity.User) (int, error) {
-	var id int
-	err := r.db.QueryRow("INSERT INTO users (name, balance) VALUES ($1, $2) RETURNING id", user.Name, user.Balance).Scan(&id)
+func (r *UserRepository) CreateUser(user entity.User) (entity.User, error) {
+	var createdUser entity.User
+	err := r.db.QueryRow("INSERT INTO users (name, balance) VALUES ($1, $2) RETURNING id, name, balance", user.Name, user.Balance).Scan(&createdUser.ID, &createdUser.Name, &createdUser.Balance)
 	if err != nil {
-		return 0, err
+		return entity.User{}, err
 	}
-	return id, nil
+	return createdUser, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (entity.User, error) {

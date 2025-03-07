@@ -8,6 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserService interface {
+	CreateUser(user entity.User) (entity.User, error)
+	GetUserByID(id int) (entity.User, error)
+	UpdateUser(user *entity.User) error
+	DeleteUser(id int) error
+}
+
+type UserHandler struct {
+	UserService UserService
+}
+
+func NewUserHandler(userService UserService) *UserHandler {
+	return &UserHandler{UserService: userService}
+}
+
 // @Summary Create User
 // @Tags user
 // @Description create user
@@ -20,7 +35,7 @@ import (
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /users [post]
-func (h *Handler) CreateUser(c *gin.Context) {
+func (h *UserHandler) CreateUser(c *gin.Context) {
 	var user entity.User
 	if err := c.BindJSON(&user); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -28,15 +43,13 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	}
 
 	//Создание пользователя
-	id, err := h.service.UserService.CreateUser(&user)
+	createdUser, err := h.UserService.CreateUser(user)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	user.ID = id
-
-	c.JSON(http.StatusCreated, user)
+	c.JSON(http.StatusCreated, createdUser)
 }
 
 // @Summary Replenish Balance
@@ -52,7 +65,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /users/{id}/replenish-balance [post]
-func (h *Handler) ReplenishBalance(c *gin.Context) {
+func (h *UserHandler) ReplenishBalance(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -66,14 +79,14 @@ func (h *Handler) ReplenishBalance(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.UserService.GetUserByID(id)
+	user, err := h.UserService.GetUserByID(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	user.Balance += float64(input)
-	err = h.service.UserService.UpdateUser(&user)
+	err = h.UserService.UpdateUser(&user)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

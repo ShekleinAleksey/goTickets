@@ -8,31 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var movies []entity.Movie
+type MovieService interface {
+	GetAllMovies() ([]entity.Movie, error)
+	GetMovieByID(id int) (entity.Movie, error)
+}
 
-// @Summary Create Movie
-// @Tags movie
-// @Description create movie
-// @ID create-movie
-// @Accept json
-// @Produce json
-// @Param input body entity.Movie true "create movie"
-// @Success 200 {object} entity.Movie
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
-// @Router /movies [post]
-func (h *Handler) CreateMovie(c *gin.Context) {
-	var movie entity.Movie
-	if err := c.BindJSON(&movie); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
+type MovieHandler struct {
+	MovieService MovieService
+}
 
-	movie.ID = len(movies) + 1
-	movies = append(movies, movie)
-
-	c.JSON(http.StatusCreated, movie)
+func NewMovieHandler(movieService MovieService) *MovieHandler {
+	return &MovieHandler{MovieService: movieService}
 }
 
 // @Summary Get Movies
@@ -46,8 +32,8 @@ func (h *Handler) CreateMovie(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /movies [get]
-func (h *Handler) GetMovies(c *gin.Context) {
-	movies, err := h.service.MovieService.GetAllMovies()
+func (h *MovieHandler) GetMovies(c *gin.Context) {
+	movies, err := h.MovieService.GetAllMovies()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -67,14 +53,14 @@ func (h *Handler) GetMovies(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /movies/{id} [get]
-func (h *Handler) GetMovieByID(c *gin.Context) {
+func (h *MovieHandler) GetMovieByID(c *gin.Context) {
 	id := c.Param("id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
-	movie, err := h.service.MovieService.GetMovieByID(idInt)
+	movie, err := h.MovieService.GetMovieByID(idInt)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

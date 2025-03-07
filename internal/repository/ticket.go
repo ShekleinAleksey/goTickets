@@ -24,9 +24,23 @@ func (r *TicketRepository) GetTicket(id int) (entity.Ticket, error) {
 
 func (r *TicketRepository) CreateTicket(screening entity.MovieScreening, userID int, seat int) error {
 
-	_, err := r.db.Exec("INSERT INTO tickets (movie_screening_id, user_id, seat, price) VALUES ($1, $2, $3, $4)", screening.ID, userID, seat, screening.TicketPrice)
+	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
-	return nil
+	defer tx.Rollback()
+
+	_, err = tx.Exec("INSERT INTO tickets (movie_screening_id, user_id, seat, price) VALUES ($1, $2, $3, $4)", screening.ID, userID, seat, screening.TicketPrice)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec("UPDATE users SET balance = $1 WHERE user_id = $2", user.Balance, userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec("UPDATE movie_screening SET available_seats = $1 WHERE movie_screening = $2", availableSeats, movie_screening_id)
+
+	return tx.Commit()
 }

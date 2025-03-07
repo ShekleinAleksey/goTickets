@@ -9,36 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var movieScreenings []entity.MovieScreening
+type MovieScreeningService interface {
+	GetAllMovieScreenings() ([]entity.MovieScreening, error)
+	GetScreening(id int) (entity.MovieScreening, error)
+	UpdateScreening(screening *entity.MovieScreening) error
+}
 
-// @Summary Create Movie Screening
-// @Tags movie_screening
-// @Description create movie screening
-// @ID create-movie-screening
-// @Accept json
-// @Produce json
-// @Param input body entity.MovieScreening true "create movie screening"
-// @Success 200 {object} entity.MovieScreening
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
-// @Router /screenings [post]
-func (h *Handler) CreateMovieScreening(c *gin.Context) {
-	var screening entity.MovieScreening
-	if err := c.BindJSON(&screening); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
+type MovieScreeningHandler struct {
+	MovieScreeningService MovieScreeningService
+}
 
-	// if err := json.NewDecoder(r.Body).Decode(&screening); err != nil {
-	// 	http.Error(w, "Invalid request body", http.StatusBadRequest)
-	// 	return
-	// }
-
-	screening.ID = len(movieScreenings) + 1
-	movieScreenings = append(movieScreenings, screening)
-
-	c.JSON(http.StatusCreated, screening)
+func NewMovieSceeningHandler(movieScreeningService MovieScreeningService) *MovieScreeningHandler {
+	return &MovieScreeningHandler{MovieScreeningService: movieScreeningService}
 }
 
 // @Summary Get Movie Screenings
@@ -50,8 +32,8 @@ func (h *Handler) CreateMovieScreening(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /screenings [get]
-func (h *Handler) GetMovieScreenings(c *gin.Context) {
-	screenings, err := h.service.MovieScreeningService.GetAllMovieScreenings()
+func (h *MovieScreeningHandler) GetMovieScreenings(c *gin.Context) {
+	screenings, err := h.MovieScreeningService.GetAllMovieScreenings()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -78,14 +60,14 @@ func (h *Handler) GetMovieScreenings(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /screenings/{id} [get]
-func (h *Handler) GetMovieScreening(c *gin.Context) {
+func (h *MovieScreeningHandler) GetMovieScreening(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "Invalid screening ID")
 		return
 	}
-	screening, err := h.service.MovieScreeningService.GetScreening(id)
+	screening, err := h.MovieScreeningService.GetScreening(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -105,13 +87,13 @@ func (h *Handler) GetMovieScreening(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /screenings/filter [get]
-func (h *Handler) FilterMovieScreenings(c *gin.Context) {
+func (h *MovieScreeningHandler) FilterMovieScreenings(c *gin.Context) {
 	// Получаем параметры фильтрации
 	movieIDStr := c.Query("movie_id")
 	dateStr := c.Query("date")
 
 	// Получаем все сеансы
-	screenings, err := h.service.MovieScreeningService.GetAllMovieScreenings()
+	screenings, err := h.MovieScreeningService.GetAllMovieScreenings()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

@@ -2,6 +2,13 @@ package service
 
 import "github.com/ShekleinAleksey/goTickets/internal/repository"
 
+type Deps struct {
+	UserRepository           *repository.UserRepository
+	MovieRepository          *repository.MovieRepository
+	MovieScreeningRepository *repository.MovieScreeningRepository
+	TicketRepository         *repository.TicketRepository
+}
+
 type Service struct {
 	UserService           *UserService
 	MovieService          *MovieService
@@ -9,11 +16,11 @@ type Service struct {
 	TicketService         *TicketService
 }
 
-func NewService(repo *repository.Repository) *Service {
+func NewService(deps Deps) *Service {
 	return &Service{
-		UserService:           NewUserService(*repo.UserRepository),
-		MovieService:          NewMovieService(*repo.MovieRepository),
-		MovieScreeningService: NewMovieScreeningService(*repo.MovieScreeningRepository),
-		TicketService:         NewTicketService(*repo.TicketRepository),
+		UserService:           NewUserService(*deps.UserRepository),
+		MovieService:          NewMovieService(*deps.MovieRepository),
+		MovieScreeningService: NewMovieScreeningService(*deps.MovieScreeningRepository),
+		TicketService:         NewTicketService(*deps.TicketRepository),
 	}
 }

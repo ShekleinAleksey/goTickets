@@ -49,11 +49,21 @@ func Run() {
 	defer db.Close()
 
 	logrus.Info("Initializing repository...")
-	repos := repository.NewRepository(db)
+	repo := repository.NewRepository(db)
 	logrus.Info("Initializing service...")
-	services := service.NewService(repos)
+	service := service.NewService(service.Deps{
+		UserRepository:           repo.UserRepository,
+		MovieRepository:          repo.MovieRepository,
+		MovieScreeningRepository: repo.MovieScreeningRepository,
+		TicketRepository:         repo.TicketRepository,
+	})
 	logrus.Info("Initializing handler...")
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(handler.Deps{
+		MovieService:          service.MovieService,
+		MovieScreeningService: service.MovieScreeningService,
+		TicketService:         service.TicketService,
+		UserService:           service.UserService,
+	})
 
 	router := handlers.InitRoutes()
 

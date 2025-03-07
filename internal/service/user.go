@@ -13,12 +13,12 @@ func NewUserService(repo repository.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) CreateUser(user *entity.User) (int, error) {
-	id, err := s.repo.CreateUser(user)
+func (s *UserService) CreateUser(user entity.User) (entity.User, error) {
+	createdUser, err := s.repo.CreateUser(user)
 	if err != nil {
-		return 0, err
+		return entity.User{}, err
 	}
-	return id, nil
+	return createdUser, nil
 }
 
 func (s *UserService) GetUserByID(id int) (entity.User, error) {

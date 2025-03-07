@@ -4,8 +4,22 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/ShekleinAleksey/goTickets/internal/entity"
 	"github.com/gin-gonic/gin"
 )
+
+type TicketService interface {
+	GetTicket(id int) (entity.Ticket, error)
+	BuyTicket(screeningID int, userID int, seat int) error
+}
+
+type TicketHandler struct {
+	TicketService TicketService
+}
+
+func NewTicketHandler(ticketService TicketService) *TicketHandler {
+	return &TicketHandler{TicketService: ticketService}
+}
 
 // @Summary Get Ticket
 // @Tags ticket
@@ -19,7 +33,7 @@ import (
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /tickets/{id} [get]
-func (h *Handler) GetTicket(c *gin.Context) {
+func (h *TicketHandler) GetTicket(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -27,7 +41,7 @@ func (h *Handler) GetTicket(c *gin.Context) {
 		return
 	}
 
-	ticket, err := h.service.TicketService.GetTicket(id)
+	ticket, err := h.TicketService.GetTicket(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -48,9 +62,9 @@ func (h *Handler) GetTicket(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /tickets/buy [post]
-func (h *Handler) BuyTicket(c *gin.Context) {
-	idStr := c.Query("screening_id")
-	id, err := strconv.Atoi(idStr)
+func (h *TicketHandler) BuyTicket(c *gin.Context) {
+	screeningIDStr := c.Query("screening_id")
+	screeningID, err := strconv.Atoi(screeningIDStr)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "Invalid screening ID")
 		return
@@ -70,26 +84,7 @@ func (h *Handler) BuyTicket(c *gin.Context) {
 		return
 	}
 
-	screening, err := h.service.MovieScreeningService.GetScreening(id)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	err = h.service.TicketService.BuyTicket(screening, userID, seat)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	user, err := h.service.UserService.GetUserByID(userID)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	user.Balance -= screening.TicketPrice
-	err = h.service.UserService.UpdateUser(&user)
+	err = h.TicketService.BuyTicket(screeningID, userID, seat)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
