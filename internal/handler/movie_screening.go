@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/ShekleinAleksey/goTickets/internal/entity"
 	"github.com/gin-gonic/gin"
@@ -88,59 +87,15 @@ func (h *MovieScreeningHandler) GetMovieScreening(c *gin.Context) {
 // @Failure default {object} errorResponse
 // @Router /screenings/filter [get]
 func (h *MovieScreeningHandler) FilterMovieScreenings(c *gin.Context) {
-	// Получаем параметры фильтрации
+
 	movieIDStr := c.Query("movie_id")
+	movieID, err := strconv.Atoi(movieIDStr)
 	dateStr := c.Query("date")
 
-	// Получаем все сеансы
-	screenings, err := h.MovieScreeningService.GetAllMovieScreenings()
+	screenings, err := h.MovieScreeningService.FilterScreenings(movieID, dateStr)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
-	}
-
-	// Фильтруем по ID фильма, если указан
-	if movieIDStr != "" {
-		movieID, err := strconv.Atoi(movieIDStr)
-		if err != nil {
-			newErrorResponse(c, http.StatusBadRequest, "Invalid movie ID")
-			return
-		}
-
-		filteredScreenings := make([]entity.MovieScreening, 0)
-		for _, screening := range screenings {
-			if screening.MovieID == movieID {
-				filteredScreenings = append(filteredScreenings, screening)
-			}
-		}
-		screenings = filteredScreenings
-	}
-
-	// Фильтруем по дате, если указана
-	if dateStr != "" {
-		date, err := time.Parse("2006-01-02", dateStr)
-		if err != nil {
-			newErrorResponse(c, http.StatusBadRequest, "Invalid date format. Use YYYY-MM-DD")
-			return
-		}
-
-		filteredScreenings := make([]entity.MovieScreening, 0)
-		for _, screening := range screenings {
-			if screening.ShowTime.Format("2006-01-02") == date.Format("2006-01-02") {
-				filteredScreenings = append(filteredScreenings, screening)
-			}
-		}
-		screenings = filteredScreenings
-	}
-
-	// Загружаем информацию о фильмах для каждого сеанса
-	for i, screening := range screenings {
-		movie, err := h.service.MovieService.GetMovieByID(screening.MovieID)
-		if err != nil {
-			newErrorResponse(c, http.StatusInternalServerError, err.Error())
-			return
-		}
-		screenings[i].Movie = movie
 	}
 
 	c.JSON(http.StatusOK, screenings)

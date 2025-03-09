@@ -41,3 +41,11 @@ func (r *MovieScreeningRepository) UpdateScreening(screening *entity.MovieScreen
 	}
 	return nil
 }
+
+func (r *MovieScreeningRepository) FilterScreenings(movieID int, dateStr string) ([]entity.MovieScreening, error) {
+	var screenings []entity.MovieScreening
+
+	//берем из бд
+
+	return screenings, nil
+}

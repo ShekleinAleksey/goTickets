@@ -40,7 +40,7 @@ func (r *TicketRepository) CreateTicket(screening entity.MovieScreening, userID 
 		return err
 	}
 
-	_, err = r.db.Exec("UPDATE movie_screening SET available_seats = $1 WHERE movie_screening = $2", availableSeats, movie_screening_id)
+	_, err = r.db.Exec("UPDATE movie_screening SET available_seats = $1 WHERE movie_screening = $2", availableSeats, screening.ID)
 
 	return tx.Commit()
 }

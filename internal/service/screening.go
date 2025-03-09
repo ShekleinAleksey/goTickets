@@ -36,3 +36,11 @@ func (s *MovieScreeningService) UpdateScreening(screening *entity.MovieScreening
 	}
 	return nil
 }
+
+func (s *MovieScreeningService) FilterScreenings(movieIDStr string, dateStr string) ([]entity.MovieScreening, error) {
+	screenings, err := s.repo.FilterScreenings(movieIDStr, dateStr)
+	if err != nil {
+		return nil, err
+	}
+	return screenings, nil
+}
